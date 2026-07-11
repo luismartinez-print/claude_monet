@@ -165,7 +165,7 @@ class Residual(nn.Module):
 
   def forward(self, x):
     return x + self.block(x)
-    ```
+```
 This might be the most different part from a standard Neural Net from this Autoencoder. 
 
 This is a Residual Block aka ResNet Block (sonds familiar right). In a conventional CNN we would like to expand the data or compress it further, meaning creating more channels; for example 3 -> 32 -> 64 -> 128. However, this has a totally different job, we want to "upgrade" the features in the current depth of channels. 
@@ -246,12 +246,12 @@ In order to be easier to understand what happens in this exact part of the code 
 
 | Pipeline Stage | Active Layer | Output Tensor Shape <br>`[Channels, Height, Width]` | Technical Purpose |
 | :--- | :--- | :--- | :--- |
-| **Input** | *Your Photo* | `[3, 256, 256]` | Raw RGB input data. |
-| **Encoder** | `initial_layer` | `[64, 256, 256]` | Stabilizes features with a large $7\times7$ patch. |
-| **Encoder** | `down_1` & `down_2` | `[256, 64, 64]` | Spatially squashes image by $4\times$, expanding channels. |
-| **Bottleneck** | `residuals` ($\times9$) | `[256, 64, 64]` | Monet's style modifications via **Skip Connections**. |
-| **Decoder** | `up_1` & `up_2` | `[64, 256, 256]` | Smoothly stretches spatial geometry back out using **Bilinear Interpolation**. |
-| **Output**| `last` | `[3, 256, 256]` | Compresses channels to 3 (RGB) and anchors pixels with `Tanh()`. |
+| **Input** | *Input* | [3, 256, 256] | Raw RGB input data. |
+| **Encoder** | initial_layer | [64, 256, 256] | Stabilizes features with a large $7\times7$ patch. |
+| **Encoder** | down_1 & down_2 | [256, 64, 64] | Spatially squashes image by $4\times$, expanding channels. |
+| **Bottleneck** | residuals ($\times9$) | [256, 64, 64] | Monet's style modifications via **Skip Connections**. |
+| **Decoder** | up_1 & up_2 | [64, 256, 256] | Smoothly stretches spatial geometry back out using **Bilinear Interpolation**. |
+| **Output**| last | [3, 256, 256] | Compresses channels to 3 (RGB) and anchors pixels with Tanh(). |
 
 When we see this table we can see that it works with a mirror, the down sample and the upsample code are mirroring themselves in the number of features. Then we pass through the residual 9 times to get those styles.
 

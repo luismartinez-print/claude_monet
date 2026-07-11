@@ -187,7 +187,7 @@ Now that we have encoded or translated the image in a way a computer can
 understand it, by crunching it with convolution, now is the moment for
 the model to learn the actual style of Monets or Pictures.
 
-```` python
+``` python
 class Residual(nn.Module):
   def __init__(self, channels):
     super().__init__()
@@ -204,23 +204,34 @@ class Residual(nn.Module):
 
   def forward(self, x):
     return x + self.block(x)
-    ```
-This might be the most different part from a standard Neural Net from this Autoencoder. 
+```
 
-This is a Residual Block aka ResNet Block (sonds familiar right). In a conventional CNN we would like to expand the data or compress it further, meaning creating more channels; for example 3 -> 32 -> 64 -> 128. However, this has a totally different job, we want to "upgrade" the features in the current depth of channels. 
+This might be the most different part from a standard Neural Net from
+this Autoencoder.
 
-And this is used in one line the `return x + self.block(x)`, this operation is called skip connection. 
+This is a Residual Block aka ResNet Block (sonds familiar right). In a
+conventional CNN we would like to expand the data or compress it
+further, meaning creating more channels; for example 3 -\> 32 -\> 64 -\>
+128. However, this has a totally different job, we want to “upgrade” the
+features in the current depth of channels.
 
-Instead of the model just deleting from it's memory of x was (X is the feature maps) we let it in so that the model remembers the structural patterns (remeber the tree stuff in the encoder) and we add the styles that it learns through this Residual block. That's the reason we do not change the number of channels, since we cannot add tensors with different dimensions.
+And this is used in one line the `return x + self.block(x)`, this
+operation is called skip connection.
 
+Instead of the model just deleting from it’s memory of x was (X is the
+feature maps) we let it in so that the model remembers the structural
+patterns (remeber the tree stuff in the encoder) and we add the styles
+that it learns through this Residual block. That’s the reason we do not
+change the number of channels, since we cannot add tensors with
+different dimensions.
 
 ### Decoder
 
-Now that we have built the encoder, how the model learns the styles and keeps the structure of the image, we are missing one piece, something that brings it back to something we can see, that 256 X 256 X 3 image.
+Now that we have built the encoder, how the model learns the styles and
+keeps the structure of the image, we are missing one piece, something
+that brings it back to something we can see, that 256 X 256 X 3 image.
 
-
-```{python}
-
+``` python
 class Decoder(nn.Module):
   def __init__(self, in_channels, out_channels):
     super().__init__()
@@ -233,7 +244,7 @@ class Decoder(nn.Module):
 
   def forward(self, x):
     return self.upsample(x)
-````
+```
 
 Here we use a upsample fucntion so that we don’t look at pixelated
 pictures that a transposed Conv 2d would give us. We use a resize
@@ -287,12 +298,12 @@ the code we will use a table, since is easier than raw code.
 
 | Pipeline Stage | Active Layer | Output Tensor Shape <br>`[Channels, Height, Width]` | Technical Purpose |
 |:---|:---|:---|:---|
-| **Input** | *Your Photo* | `[3, 256, 256]` | Raw RGB input data. |
-| **Encoder** | `initial_layer` | `[64, 256, 256]` | Stabilizes features with a large $7\times7$ patch. |
-| **Encoder** | `down_1` & `down_2` | `[256, 64, 64]` | Spatially squashes image by $4\times$, expanding channels. |
-| **Bottleneck** | `residuals` ($\times9$) | `[256, 64, 64]` | Monet’s style modifications via **Skip Connections**. |
-| **Decoder** | `up_1` & `up_2` | `[64, 256, 256]` | Smoothly stretches spatial geometry back out using **Bilinear Interpolation**. |
-| **Output** | `last` | `[3, 256, 256]` | Compresses channels to 3 (RGB) and anchors pixels with `Tanh()`. |
+| **Input** | *Input* | \[3, 256, 256\] | Raw RGB input data. |
+| **Encoder** | initial_layer | \[64, 256, 256\] | Stabilizes features with a large $7\times7$ patch. |
+| **Encoder** | down_1 & down_2 | \[256, 64, 64\] | Spatially squashes image by $4\times$, expanding channels. |
+| **Bottleneck** | residuals ($\times9$) | \[256, 64, 64\] | Monet’s style modifications via **Skip Connections**. |
+| **Decoder** | up_1 & up_2 | \[64, 256, 256\] | Smoothly stretches spatial geometry back out using **Bilinear Interpolation**. |
+| **Output** | last | \[3, 256, 256\] | Compresses channels to 3 (RGB) and anchors pixels with Tanh(). |
 
 When we see this table we can see that it works with a mirror, the down
 sample and the upsample code are mirroring themselves in the number of
